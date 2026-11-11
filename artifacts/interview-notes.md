@@ -82,7 +82,7 @@ Run: `go test -race ./...` after each tweak; revert before commit unless extendi
 20. **Secret literals?** Conservative field names only; not full entropy detection.
 21. **Input bounds?** 10 MiB, nesting depth 64—documented in README.
 22. **Race detector in CI?** `go test -race` catches concurrent map issues if we extend parser.
-23. **Docker image?** Distroless static nonroot binary from Go 1.22.12.
+23. **Docker image?** Distroless static nonroot binary built with Go 1.27.4.
 24. **Why no providers in tests?** Keeps portfolio lean; optional `terraform_data` module only.
 25. **How would you add RDS?** Extend `catalog.SupportedAWSTypes`, rules, and a synthetic fixture test.
 26. **False positives on unknown ingress?** Tradeoff of fail-closed vs deferred rules—tune paths or allowlist.
