@@ -1,0 +1,82 @@
+{
+  "_fixture_meta": {
+    "synthetic": true,
+    "description": "Passing catalog resources; not an actual AWS plan"
+  },
+  "format_version": "1.2",
+  "terraform_version": "1.6.0",
+  "resource_changes": [
+    {
+      "address": "aws_security_group.web",
+      "type": "aws_security_group",
+      "name": "web",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "ingress": [
+            {
+              "cidr_blocks": ["10.0.0.0/8"],
+              "ipv6_cidr_blocks": [],
+              "from_port": 443,
+              "to_port": 443,
+              "protocol": "tcp"
+            }
+          ]
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket.logs",
+      "type": "aws_s3_bucket",
+      "name": "logs",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "acl": "private",
+          "tags": {
+            "Environment": "dev"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_server_side_encryption_configuration.logs",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "logs",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": {
+                "sse_algorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.logs",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "logs",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

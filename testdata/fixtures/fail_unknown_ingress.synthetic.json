@@ -1,0 +1,16 @@
+{
+  "_fixture_meta": { "synthetic": true },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_security_group.pending",
+      "type": "aws_security_group",
+      "name": "pending",
+      "change": {
+        "actions": ["create"],
+        "after": { "ingress": [] },
+        "after_unknown": { "ingress": true }
+      }
+    }
+  ]
+}

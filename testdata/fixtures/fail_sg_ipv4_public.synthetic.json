@@ -1,0 +1,26 @@
+{
+  "_fixture_meta": { "synthetic": true, "description": "Public IPv4 ingress" },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_security_group.open",
+      "type": "aws_security_group",
+      "name": "open",
+      "change": {
+        "actions": ["update"],
+        "before": {},
+        "after": {
+          "ingress": [
+            {
+              "cidr_blocks": ["0.0.0.0/0"],
+              "from_port": 22,
+              "to_port": 22,
+              "protocol": "tcp"
+            }
+          ]
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

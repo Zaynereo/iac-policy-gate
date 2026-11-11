@@ -1,0 +1,25 @@
+{
+  "_fixture_meta": { "synthetic": true, "description": "Public IPv6 ingress" },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_security_group.v6",
+      "type": "aws_security_group",
+      "name": "v6",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "ingress": [
+            {
+              "ipv6_cidr_blocks": ["::/0"],
+              "from_port": 443,
+              "to_port": 443,
+              "protocol": "tcp"
+            }
+          ]
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

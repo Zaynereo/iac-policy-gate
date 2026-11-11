@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27.4"
+          cache-dependency-path: go.sum
+      - name: go vet
+        run: go vet ./...
+      - name: go test race
+        run: go test -race -count=1 ./...
+      - name: Setup Terraform (stub module only — not full IaC evidence)
+        if: hashFiles('modules/terraform_data/*.tf') != ''
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: terraform fmt check (blocking, modules/terraform_data only)
+        if: hashFiles('modules/terraform_data/*.tf') != ''
+        run: terraform -chdir=modules/terraform_data fmt -check -recursive
+      - name: terraform validate (blocking, provider-free stub)
+        if: hashFiles('modules/terraform_data/*.tf') != ''
+        run: |
+          terraform -chdir=modules/terraform_data init -backend=false
+          terraform -chdir=modules/terraform_data validate
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker build
+        run: docker build -t iac-policy-gate:ci .

@@ -1,0 +1,16 @@
+{
+  "_fixture_meta": { "synthetic": true },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.weird",
+      "type": "aws_s3_bucket",
+      "name": "weird",
+      "change": {
+        "actions": ["read"],
+        "after": { "tags": { "Environment": "x" } },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

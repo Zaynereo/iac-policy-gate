@@ -1,0 +1,26 @@
+{
+  "_fixture_meta": { "synthetic": true },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_security_group.app",
+      "type": "aws_security_group",
+      "name": "app",
+      "change": {
+        "actions": ["delete", "create"],
+        "before": { "ingress": [] },
+        "after": {
+          "ingress": [
+            {
+              "cidr_blocks": ["10.0.0.0/16"],
+              "from_port": 443,
+              "to_port": 443,
+              "protocol": "tcp"
+            }
+          ]
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "_fixture_meta": { "synthetic": true },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_security_group.array_unknown",
+      "type": "aws_security_group",
+      "name": "array_unknown",
+      "change": {
+        "actions": ["create"],
+        "after": { "ingress": [] },
+        "after_unknown": {
+          "ingress": [
+            {
+              "cidr_blocks": [true]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
