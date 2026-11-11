@@ -1,0 +1,19 @@
+{
+  "_fixture_meta": { "synthetic": true },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.public",
+      "type": "aws_s3_bucket",
+      "name": "public",
+      "change": {
+        "actions": ["update"],
+        "after": {
+          "acl": "public-read",
+          "tags": { "Environment": "lab" }
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}
