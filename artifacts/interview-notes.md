@@ -63,8 +63,10 @@ Run: `go test -race ./...` after each tweak; revert before commit unless extendi
 3. **Why fail closed?** Silent passes on unknown formats or resources create false confidence in security interviews and production.
 4. **Why a closed catalog?** Bounded scope proves rule design; “support all AWS” is a different product.
 5. **How do you handle `after_unknown`?** Flag security-relevant paths listed per resource type; ignore unrelated unknowns.
-6. **What’s not validated?** Full provider schemas, computed fields outside paths, non-AWS resources.
+6. **What’s not validated?** Full provider schemas, computed fields outside paths, resource types outside the closed catalog (fail closed).
 7. **Exit code 0 with warnings?** Yes—`delete` emits warn for human/process review, not auto-approve.
+7b. **No-op resources?** Evaluated on effective values; unchanged public SG still fails.
+7c. **Google/non-AWS types?** Fail closed unless documented exempt (`mode=data`, `terraform_data`).
 8. **How are rule IDs used?** Metrics, allowlists, ticketing integrations (`AWS-SG-INGRESS-IPV4-PUBLIC`).
 9. **Why synthetic fixtures?** Reproducible CI without cloud spend or credential risk.
 10. **How do you label synthetics?** `*.synthetic.json` + `_fixture_meta.synthetic` in files.

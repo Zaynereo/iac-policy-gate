@@ -1,0 +1,17 @@
+{
+  "_fixture_meta": { "synthetic": true, "description": "data mode is documented exempt from catalog" },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "data.aws_iam_policy_document.assume",
+      "type": "aws_iam_policy_document",
+      "name": "assume",
+      "mode": "data",
+      "change": {
+        "actions": ["read"],
+        "after": {},
+        "after_unknown": {}
+      }
+    }
+  ]
+}

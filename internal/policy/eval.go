@@ -13,6 +13,9 @@ import (
 func Evaluate(doc *plan.Document) Report {
 	var findings []Finding
 	for _, rc := range doc.ResourceChanges {
+		if catalog.IsCatalogExempt(rc.Type, rc.Mode) {
+			continue
+		}
 		action := plan.ClassifyActions(rc.Change.Actions)
 		if action == plan.ActionUnsupported {
 			findings = append(findings, Finding{
@@ -25,7 +28,6 @@ func Evaluate(doc *plan.Document) Report {
 			continue
 		}
 		actionStr := string(action)
-		// Security-relevant changes: evaluate create, update, replace; delete is flagged for review; noop skipped with explicit catalog rules only on non-noop.
 		switch action {
 		case plan.ActionDelete:
 			findings = append(findings, Finding{
@@ -36,23 +38,20 @@ func Evaluate(doc *plan.Document) Report {
 				Action:   actionStr,
 			})
 			continue
-		case plan.ActionNoop:
-			continue
 		}
 
-		if catalog.IsAWSProviderType(rc.Type) && !catalog.IsCatalogType(rc.Type) {
+		if !catalog.IsCatalogType(rc.Type) {
 			findings = append(findings, Finding{
 				RuleID:   RulePlanUnsupportedResource,
 				Severity: SeverityError,
-				Message:  fmt.Sprintf("aws resource type %q is outside the documented catalog", rc.Type),
+				Message:  fmt.Sprintf("resource type %q is outside the documented catalog (fail closed)", rc.Type),
 				Resource: rc.Address,
 				Action:   actionStr,
 			})
 			continue
 		}
-		if !catalog.IsCatalogType(rc.Type) {
-			continue
-		}
+
+		values := effectiveChangeValues(rc.Change)
 
 		if err := walkUnknown(rc.Type, rc.Change.AfterUnknown, rc.Address, actionStr, &findings); err != nil {
 			findings = append(findings, Finding{
@@ -64,7 +63,7 @@ func Evaluate(doc *plan.Document) Report {
 			})
 		}
 
-		afterObj, _ := parseObject(rc.Change.After)
+		afterObj, _ := parseObject(values)
 		switch rc.Type {
 		case "aws_security_group":
 			checkSecurityGroup(rc, afterObj, actionStr, &findings)
@@ -75,7 +74,11 @@ func Evaluate(doc *plan.Document) Report {
 		case "aws_s3_bucket":
 			checkS3BucketTagsAndSecrets(rc, afterObj, actionStr, &findings)
 		}
-		scanSecretLiterals(rc.Change.After, rc.Address, actionStr, "after", &findings)
+		root := "after"
+		if action == plan.ActionNoop {
+			root = "effective"
+		}
+		scanSecretLiterals(values, rc.Address, actionStr, root, &findings)
 	}
 
 	SortFindings(findings)
@@ -86,6 +89,13 @@ func Evaluate(doc *plan.Document) Report {
 		}
 	}
 	return Report{Passed: passed, Findings: findings}
+}
+
+func effectiveChangeValues(ch plan.ChangeBlock) json.RawMessage {
+	if len(ch.After) > 0 && string(ch.After) != "null" {
+		return ch.After
+	}
+	return ch.Before
 }
 
 func parseObject(raw json.RawMessage) (map[string]any, bool) {
@@ -158,6 +168,13 @@ func collectUnknownTrue(v any, prefix string) []string {
 	case []any:
 		for i, child := range t {
 			p := fmt.Sprintf("%s[%d]", prefix, i)
+			if prefix == "" {
+				p = fmt.Sprintf("[%d]", i)
+			}
+			if b, ok := child.(bool); ok && b {
+				out = append(out, p)
+				continue
+			}
 			out = append(out, collectUnknownTrue(child, p)...)
 		}
 	}

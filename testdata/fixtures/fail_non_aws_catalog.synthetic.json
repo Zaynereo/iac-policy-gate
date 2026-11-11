@@ -1,0 +1,16 @@
+{
+  "_fixture_meta": { "synthetic": true, "description": "Non-AWS managed resource outside catalog" },
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "google_compute_network.vpc",
+      "type": "google_compute_network",
+      "name": "vpc",
+      "change": {
+        "actions": ["create"],
+        "after": { "name": "demo" },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

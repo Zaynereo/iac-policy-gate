@@ -4,6 +4,10 @@ Go CLI portfolio project (**Habib Noor**) for infrastructure / backend / securit
 
 > **Evidence model:** Core validation uses **hand-authored synthetic plan JSON** (see `testdata/fixtures/*.synthetic.json`). These files are **not** real AWS account plans and must not be treated as live-state or cloud audit evidence.
 
+## Runtime
+
+Go **1.27.4** (current stable per [go.dev/VERSION](https://go.dev/VERSION) as of Nov 2026), pinned consistently in `go.mod`, CI, and `Dockerfile`.
+
 ## Quick start
 
 ```bash
@@ -58,12 +62,14 @@ Packages:
 | `aws_s3_bucket_public_access_block` | `AWS-S3-PUBLIC-ACCESS-OPEN` | All four block booleans must be `true` |
 | `aws_s3_bucket` | `AWS-TAG-ENV-MISSING`, `AWS-S3-PUBLIC-ACCESS-OPEN`, `AWS-SECRET-LITERAL-AFTER` | `tags.Environment`, `acl`, conservative secret **field names** in `after` |
 | (plan-wide) | `PLAN-UNKNOWN-VALUE` | Relevant `after_unknown` paths per catalog type |
-| (plan-wide) | `PLAN-UNSUPPORTED-RESOURCE` | Any `aws_*` type **not** in the catalog |
+| (plan-wide) | `PLAN-UNSUPPORTED-RESOURCE` | Any managed resource type **not** in the catalog (all providers) |
 | (plan-wide) | `PLAN-UNSUPPORTED-ACTION` | Unknown action tuples; `delete` emits **warn** and skips `after` checks |
 
 **Supported `format_version` (exact, not prefix):** `1.0`, `1.1`, `1.2`
 
-**Change actions:** `no-op` (skip), `create` / `update` / replace (`delete`+`create`), `delete` (warn + skip `after` rules). Unsupported sequences fail closed.
+**Catalog exemptions (documented only):** `mode=data` data sources; `terraform_data` resources. All other types must appear in the catalog.
+
+**Change actions:** `no-op` is **evaluated** (effective `after`/`before` values — unchanged insecure config still fails). `create` / `update` / replace (`delete`+`create`); `delete` (warn + skip value rules). Unsupported sequences fail closed.
 
 **Secrets:** Conservative literal scan on documented field names (`password`, `api_key`, …)—**not** a “detect all secrets” claim. Empty / `(sensitive value)` placeholders are ignored.
 
@@ -78,7 +84,7 @@ Invalid JSON, unsupported format versions, and missing `resource_changes` fail c
 
 ## Optional Terraform fmt/validate
 
-`modules/terraform_data/` is a **provider-free** stub for optional local/CI `terraform fmt` / `validate` only (see `.github/workflows/ci.yml`). No provider download or network init in the main policy path.
+`modules/terraform_data/` is a **provider-free** stub. CI runs **blocking** `terraform fmt` / `validate` on that directory only (deterministic; no providers). This is **not** evidence that application IaC modules were validated—only the built-in stub.
 
 ## Design decisions
 
@@ -92,7 +98,8 @@ Invalid JSON, unsupported format versions, and missing `resource_changes` fail c
 - Does **not** validate complete Terraform provider schemas or evaluate real AWS accounts.
 - Does **not** run `terraform plan` or access remote state.
 - Secret detection is **name-based and conservative**; structured secret scanning is out of scope.
-- Non-AWS resources are ignored (not in policy scope).
+- **Fail-closed catalog:** non-exempt resources outside the documented catalog fail (not only `aws_*`).
+- **No-op plans:** evaluates effective values; a passing gate does **not** mean every resource type in the account was reviewed.
 
 ## Tests
 

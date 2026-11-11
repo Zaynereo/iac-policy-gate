@@ -55,6 +55,11 @@ func TestEvaluate_ruleIDs(t *testing.T) {
 		{"pass_replace.synthetic.json", true, nil},
 		{"warn_delete.synthetic.json", true, nil},
 		{"fail_unsupported_action.synthetic.json", false, []string{RulePlanUnsupportedAction}},
+		{"fail_non_aws_catalog.synthetic.json", false, []string{RulePlanUnsupportedResource}},
+		{"fail_noop_public_sg.synthetic.json", false, []string{RuleAWSSGIngressIPv4Public}},
+		{"fail_unknown_nested_array.synthetic.json", false, []string{RulePlanUnknownValue}},
+		{"pass_exempt_data_mode.synthetic.json", true, nil},
+		{"pass_exempt_terraform_data.synthetic.json", true, nil},
 	}
 	for _, c := range cases {
 		t.Run(c.file, func(t *testing.T) {

@@ -8,7 +8,7 @@ type ResourceSpec struct {
 	Attributes  []string // documented paths rules may read (not exhaustive Terraform schema)
 }
 
-// SupportedAWSTypes is the closed catalog: other aws_* types in a plan fail closed.
+// SupportedAWSTypes is the closed policy catalog for managed resources (any other type fails closed unless exempt).
 var SupportedAWSTypes = map[string]ResourceSpec{
 	"aws_security_group": {
 		Type:        "aws_security_group",
